@@ -1,0 +1,1 @@
+# make 'generator' a package
