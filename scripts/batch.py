@@ -3,6 +3,7 @@ from datetime import datetime
 import pytz
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from generator.make_one import make_video
 
 SHEET_CSV_URL = os.environ.get('SHEET_CSV_URL','')
 TIMEZONE = os.environ.get('LOCAL_TZ','America/New_York')
@@ -42,8 +43,8 @@ for i, r in enumerate(today_rows, 1):
     out = f"output/{i:02d}.mp4"
     print(f"Making: {subject}")
 
-    # Make a fake video file for now (we’ll replace this later)
-    open(out, "wb").close()
+    make_video(subject, script, out, duration=DEFAULT_DURATION)
+
 
     body = {
       'snippet': {
