@@ -17,6 +17,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          - name: Show workspace layout
+  run: |
+    pwd
+    ls -R
+    python - <<'PY'
+import sys, os
+print("CWD:", os.getcwd())
+print("sys.path:")
+for p in sys.path: print("  ", p)
+PY
       - name: Generate & Upload videos
         env:
           SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
