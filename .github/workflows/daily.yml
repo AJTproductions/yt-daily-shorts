@@ -1,43 +1,50 @@
 name: Daily Batch of Shorts
+
 on:
-  schedule:
-    - cron: '30 14 * * *'   # 10:30 AM Eastern
+  # Allow manual runs (still there if you find the button later)
   workflow_dispatch: {}
+  # Run automatically on every commit to main (this is our button bypass)
+  push:
+    branches: [ main ]
+  # Keep your daily schedule (10:30 AM Eastern in your example)
+  schedule:
+    - cron: '30 14 * * *'
+
 jobs:
   run-batch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          - name: Show workspace layout
-  run: |
-    pwd
-    ls -R
-    python - <<'PY'
-import sys, os
-print("CWD:", os.getcwd())
-print("sys.path:")
-for p in sys.path: print("  ", p)
-PY
-      - name: Generate & Upload videos
-        env:
-          SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
-          LOCAL_TZ: 'America/New_York'
-          MAX_PER_DAY: ${{ secrets.MAX_PER_DAY || '6' }}
-          VIDEO_DURATION: ${{ secrets.VIDEO_DURATION || '30' }}
-          VIDEO_CATEGORY: '22'
-          VIDEO_PRIVACY: 'public'
-          CLIENT_SECRET_JSON: ${{ secrets.CLIENT_SECRET_JSON }}
-          YT_TOKEN_BASE64: ${{ secrets.YT_TOKEN_BASE64 }}
+
+      # 👇 This prints the first 25 lines of the file the runner is ACTUALLY using.
+      # You will see in the logs whether it still says "from generator..." or the fixed import.
+      - name: Show batch.py first lines
+        run: sed -n '1,25p' scripts/batch.py
+
+      - name: Write secrets to files
+        shell: bash
         run: |
           echo "$CLIENT_SECRET_JSON" > client_secret.json
           echo "$YT_TOKEN_BASE64" | base64 -d > token.pickle
-          python scripts/batch.py
+
+      - name: Generate & Upload videos
+        env:
+          SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
+          LOCAL_TZ: ${{ secrets.LOCAL_TZ }}
+          MAX_PER_DAY: ${{ secrets.MAX_PER_DAY }}
+          VIDEO_DURATION: ${{ secrets.VIDEO_DURATION }}
+          VIDEO_CATEGORY: ${{ secrets.VIDEO_CATEGORY }}
+          VIDEO_PRIVACY: ${{ secrets.VIDEO_PRIVACY }}
+        run: python scripts/batch.py
