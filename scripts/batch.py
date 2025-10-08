@@ -4,6 +4,8 @@ import pytz
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from generator.make_one import make_video
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # add repo root to import path
 
 SHEET_CSV_URL = os.environ.get('SHEET_CSV_URL','')
 TIMEZONE = os.environ.get('LOCAL_TZ','America/New_York')
