@@ -96,12 +96,25 @@ def make_video(title, script, out_path, duration=30, assets_dir="assets"):
     return out_path
 # --- end video maker ---
 
-SHEET_CSV_URL = os.environ.get('SHEET_CSV_URL','')
-TIMEZONE = os.environ.get('LOCAL_TZ','America/New_York')
-MAX_PER_DAY = int(os.environ.get('MAX_PER_DAY','6'))
-DEFAULT_DURATION = int(os.environ.get('VIDEO_DURATION','30'))
-CATEGORY_ID = os.environ.get('VIDEO_CATEGORY','22')
-PRIVACY_STATUS = os.environ.get('VIDEO_PRIVACY','public')
+def _getenv_int(name, default):
+    v = os.environ.get(name, '')
+    v = (v or '').strip()
+    try:
+        return int(v) if v != '' else int(default)
+    except Exception:
+        return int(default)
+
+def _getenv_str(name, default):
+    v = os.environ.get(name, '')
+    v = (v or '').strip()
+    return v if v else default
+
+SHEET_CSV_URL   = _getenv_str('SHEET_CSV_URL', '')
+TIMEZONE        = _getenv_str('LOCAL_TZ', 'America/New_York')
+MAX_PER_DAY     = _getenv_int('MAX_PER_DAY', 6)
+DEFAULT_DURATION= _getenv_int('VIDEO_DURATION', 30)
+CATEGORY_ID     = _getenv_str('VIDEO_CATEGORY', '22')
+PRIVACY_STATUS  = _getenv_str('VIDEO_PRIVACY', 'public')
 
 with open('token.pickle','rb') as f:
     creds = pickle.load(f)
