@@ -3,9 +3,10 @@ from datetime import datetime
 import pytz
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from generator.make_one import make_video
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # add repo root to import path
+
+# ✅ IMPORTANT: make_one.py now lives in the SAME folder (scripts/)
+# so we import it directly, NOT from "generator"
+from make_one import make_video
 
 SHEET_CSV_URL = os.environ.get('SHEET_CSV_URL','')
 TIMEZONE = os.environ.get('LOCAL_TZ','America/New_York')
@@ -45,8 +46,8 @@ for i, r in enumerate(today_rows, 1):
     out = f"output/{i:02d}.mp4"
     print(f"Making: {subject}")
 
+    # ✅ Generate a real short
     make_video(subject, script, out, duration=DEFAULT_DURATION)
-
 
     body = {
       'snippet': {
